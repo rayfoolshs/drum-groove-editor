@@ -1,0 +1,11 @@
+General MIDI drum bank
+======================
+
+The drum samples in samples.js were extracted from the FluidR3Mono_GM2 soundfont
+(a monophonic rendering of Frank Wen's FluidR3 GM soundfont).
+
+  - FluidR3 GM (c) Frank Wen - MIT licence.
+  - Mono/SF2 rendering as distributed with MuseScore (FluidR3Mono_GM).
+  - Soundfont source: https://github.com/garpin7/FluidR3Mono_GM
+
+Extracted GM percussion notes: 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 53, 56, 57, 59.

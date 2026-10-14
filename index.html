@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Write, play and print drum grooves: a notation grid and staff with General MIDI drum sounds, metronome, grooves library and MIDI export." />
+<title>Drum Groove Editor</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div id="logo"><span>DRUM GROOVE</span><strong>EDITOR</strong></div>
+
+    <button class="side-btn" id="timeSigBtn" title="Choose time signature">
+      <span class="fraction"><sup id="tsTopLabel">4</sup>/<sub id="tsBottomLabel">4</sub></span>
+      <span class="side-label">TIME</span>
+    </button>
+
+    <div id="subdivisionList"></div>
+
+    <button class="side-btn" id="undoBtn" title="Undo (Ctrl+Z)"><span class="side-label">Undo</span></button>
+  </aside>
+
+  <main id="content">
+    <header id="topbar">
+      <div id="metronome">
+        <span class="muted">METRONOME:</span>
+        <button class="met-btn" id="metToggle" title="Turn the metronome on or off">OFF</button>
+        <button class="met-btn" data-met="4" title="Every quarter note">4th</button>
+        <button class="met-btn" data-met="8" title="Every eighth note">8th</button>
+        <button class="met-btn" data-met="16" title="Every sixteenth note">16th</button>
+        <label class="met-sound" title="Choose the metronome sound">Sound
+          <select id="metSound"></select>
+        </label>
+        <label class="met-vol" title="Metronome volume">Vol
+          <input type="range" id="metVolume" min="0" max="100" value="70" />
+          <span id="metVolumeValue">70%</span>
+        </label>
+      </div>
+      <div id="topRight">
+        <button class="top-btn" id="themeBtn" title="Toggle bright / dark mode">&#9790; Dark</button>
+        <button class="top-btn" id="permBtn">Permutations</button>
+        <button class="top-btn" id="groovesBtn">Grooves</button>
+        <button class="top-btn" id="helpBtn">Help</button>
+      </div>
+    </header>
+
+    <section id="transport">
+      <button id="playBtn" aria-label="Play">&#9654;</button>
+      <span id="timeDisplay">0:00</span>
+      <div class="ctl">
+        <label for="tempoRange">BPM</label>
+        <input type="range" id="tempoRange" min="20" max="300" value="80" />
+        <input type="number" id="tempoValue" min="20" max="300" value="80" />
+      </div>
+      <div class="ctl">
+        <label for="swingRange">SWING</label>
+        <input type="range" id="swingRange" min="0" max="100" value="0" />
+        <span id="swingValue">0%</span>
+      </div>
+      <div class="ctl" id="barsCtl">
+        <label>BARS</label>
+        <button class="mini" id="barMinus" title="Remove last bar">&minus;</button>
+        <span id="barCount">1</span>
+        <button class="mini" id="barPlus" title="Add a bar">+</button>
+      </div>
+    </section>
+
+    <section id="sheet">
+      <div id="staffTarget"></div>
+    </section>
+
+    <section id="fields">
+      <label>Title: <input type="text" id="tuneTitle" /></label>
+      <label>Author: <input type="text" id="tuneAuthor" /></label>
+      <label>Comment: <input type="text" id="tuneComment" /></label>
+    </section>
+
+    <section id="gridContainer"></section>
+
+    <section id="bottomRow">
+      <button class="bottom-btn" id="clearBtn">Clear All</button>
+      <button class="bottom-btn" id="extrasBtn">More drums</button>
+      <div class="menu-wrap">
+        <button class="bottom-btn" id="stickingsBtn">Stickings</button>
+        <div class="menu" id="stickingsMenu" hidden>
+          <button data-stk="toggle">Show / hide row</button>
+          <button data-stk="alternate">Alternate R/L</button>
+          <button data-stk="right">All R</button>
+          <button data-stk="left">All L</button>
+          <button data-stk="count">Counts</button>
+          <button data-stk="clear">Clear</button>
+        </div>
+      </div>
+      <div class="menu-wrap">
+        <button class="bottom-btn" id="downloadBtn">Download</button>
+        <div class="menu" id="downloadMenu" hidden>
+          <button data-dl="svg">SVG image</button>
+          <button data-dl="png">PNG image</button>
+        </div>
+      </div>
+      <button class="bottom-btn" id="exportMidiBtn">Export MIDI</button>
+      <label class="bottom-btn" id="importBtn" for="importFile">Import MIDI<input type="file" id="importFile" accept=".mid,.midi,audio/midi,audio/x-midi" hidden /></label>
+      <button class="bottom-btn" id="abcBtn">ABC</button>
+      <button class="bottom-btn" id="printBtn">Print</button>
+      <button class="bottom-btn" id="shareBtn">Share</button>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="timeSigModal" hidden>
+  <div class="modal-box">
+    <h3>Time Signature</h3>
+    <div class="ts-row">
+      <select id="tsTop"></select><span class="slash">/</span><select id="tsBottom"></select>
+    </div>
+    <div class="modal-actions">
+      <button id="tsCancel">Cancel</button><button id="tsOk" class="primary">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="shareModal" hidden>
+  <div class="modal-box">
+    <h3>Share your groove</h3>
+    <p class="muted">This URL reproduces the current groove.</p>
+    <input type="text" id="shareUrl" readonly />
+    <div class="modal-actions">
+      <button id="shareClose">Close</button><button id="copyShare" class="primary">Copy</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="groovesModal" hidden>
+  <div class="modal-box">
+    <h3>Groove library</h3>
+    <div id="grooveList" class="preset-list"></div>
+    <div class="modal-actions"><button id="groovesClose" class="primary">Close</button></div>
+  </div>
+</div>
+
+<div class="modal" id="permModal" hidden>
+  <div class="modal-box">
+    <h3>Permutations</h3>
+    <p class="muted">Transform a voice's pattern. Rotations stay inside each bar.</p>
+    <div class="perm-row">
+      <label>Voice
+        <select id="permVoice">
+          <option value="kick">Kick</option>
+          <option value="snare">Snare</option>
+          <option value="hh">Hi-hat</option>
+          <option value="tom1">High Tom</option>
+          <option value="tom4">Floor Tom</option>
+        </select>
+      </label>
+    </div>
+    <div class="perm-buttons">
+      <button data-perm="rotl">&#8634; Rotate left</button>
+      <button data-perm="rotr">&#8635; Rotate right</button>
+      <button data-perm="rev">Reverse</button>
+      <button data-perm="shift">Shift by a beat</button>
+    </div>
+    <div class="modal-actions"><button id="permClose" class="primary">Close</button></div>
+  </div>
+</div>
+
+<div class="modal" id="abcModal" hidden>
+  <div class="modal-box wide">
+    <h3>ABC notation</h3>
+    <p class="muted">Informational view of the current groove in ABC notation.</p>
+    <textarea id="abcSource" rows="12" spellcheck="false"></textarea>
+    <div class="modal-actions"><button id="abcClose" class="primary">Close</button></div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modal-box">
+    <h3>How to use</h3>
+    <ul>
+      <li>Click a dot to add or remove a note.</li>
+      <li>Right-click a dot to cycle its type (open hi-hat, accent, ghost, cross-stick, flam, buzz, rimshot, ride bell, hi-hat foot…).</li>
+      <li>Drag the slider at the right of a part to set that part's volume.</li>
+      <li>Click <b>More drums</b> to show or hide the Tom 1/2/3, Ride, Crash and Cowbell parts.</li>
+      <li>Pick a subdivision on the left to change the grid.</li>
+      <li>Use <b>+</b>/<b>&minus;</b> next to BARS to add or remove bars.</li>
+      <li>Press the triangle to play; adjust BPM and swing. Spacebar toggles playback.</li>
+      <li>Metronome: the ON/OFF button toggles it, 4th/8th/16th sets the pulse, Sound picks its tone, and Vol sets its volume.</li>
+      <li>The header's Dark / Light button switches between bright and dark mode (your choice is remembered).</li>
+      <li>Stickings, Permutations, Grooves, Download SVG/PNG, Export MIDI, Import MIDI, Print, Share.</li>
+    </ul>
+    <p class="muted">Clean rebuild of the Groove Scribe concept. Original implementation.</p>
+    <div class="modal-actions"><button id="helpClose" class="primary">Close</button></div>
+  </div>
+</div>
+
+<script src="petaluma.js"></script>
+<script src="samples.js"></script>
+<script src="audio.js"></script>
+<script src="midi.js"></script>
+<script src="staff.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

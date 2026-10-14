@@ -1,0 +1,9 @@
+# Build outputs (regenerate with: node build.js)
+drum-groove-editor-standalone.html
+drum-groove-editor.zip
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store
+desktop.ini
+*.log
