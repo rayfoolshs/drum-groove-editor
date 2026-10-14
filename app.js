@@ -253,7 +253,7 @@
   const VARIANT_CLASS = {
     open: 'v-open', accent: 'v-accent', ghost: 'v-ghost', crossstick: 'v-xstick',
     flam: 'v-flam', buzz: 'v-buzz', rimshot: 'v-rim', hihhatfoot: 'v-foot',
-    crash: 'v-crash', ride: 'v-ride', ridebell: 'v-bell', cowbell: 'v-cowbell',
+    crash: 'v-crash', ride: 'v-ride', bell: 'v-bell', ridebell: 'v-bell', cowbell: 'v-cowbell',
   };
   function variantClass(inst, idx) {
     if (!idx) return '';
@@ -504,12 +504,13 @@
     if (note === 42) return { inst: 'hh', idx: 1 };
     if (note === 44) return { inst: 'kick', idx: 2 };
     if (note === 46) return { inst: 'hh', idx: 2 };
-    if (note === 49 || note === 57) return { inst: 'hh', idx: 4 };
-    if (note === 51 || note === 59) return { inst: 'hh', idx: 5 };
-    if (note === 53) return { inst: 'hh', idx: 6 };
-    if (note === 56) return { inst: 'hh', idx: 7 };
-    if (note === 41 || note === 43 || note === 45 || note === 47) return { inst: 'tom4', idx: 1 };
+    if (note === 49 || note === 57) return { inst: 'crash', idx: 1 };
+    if (note === 51 || note === 59) return { inst: 'ride', idx: 1 };
+    if (note === 53) return { inst: 'ride', idx: 2 };
+    if (note === 56) return { inst: 'cowbell', idx: 1 };
     if (note === 48 || note === 50) return { inst: 'tom1', idx: 1 };
+    if (note === 45 || note === 47) return { inst: 'tom2', idx: 1 };
+    if (note === 41 || note === 43) return { inst: 'tom3', idx: 1 };
     return null;
   }
 
@@ -555,16 +556,13 @@
       if (v.indexOf('rimshot') >= 0) return 'd';
       return 'c';
     }
-    if (inst.id === 'hh') {
-      if (v.indexOf('open') >= 0) return '^g';
-      if (v.indexOf('crash') >= 0) return '^d';
-      if (v.indexOf('ride bell') >= 0) return '^b';
-      if (v.indexOf('ride') >= 0) return '^a';
-      if (v.indexOf('cowbell') >= 0) return '^e';
-      return '^f';
-    }
+    if (inst.id === 'hh') return v.indexOf('open') >= 0 ? '^g' : '^f';
+    if (inst.id === 'crash') return '^d';
+    if (inst.id === 'ride') return v.indexOf('bell') >= 0 ? '^b' : '^a';
+    if (inst.id === 'cowbell') return '^e';
     if (inst.id === 'tom1') return 'B,';
-    if (inst.id === 'tom4') return 'A,';
+    if (inst.id === 'tom2') return 'A,';
+    if (inst.id === 'tom3') return 'F,';
     return 'B,';
   }
 
